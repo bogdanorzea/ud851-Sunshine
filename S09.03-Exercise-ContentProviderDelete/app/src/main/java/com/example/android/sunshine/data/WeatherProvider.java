@@ -21,6 +21,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -293,7 +294,7 @@ public class WeatherProvider extends ContentProvider {
         return cursor;
     }
 
-//  TODO (1) Implement the delete method of the ContentProvider
+    // COMPLETED (1) Implement the delete method of the ContentProvider
     /**
      * Deletes data at a given URI with optional arguments for more fine tuned deletions.
      *
@@ -304,11 +305,30 @@ public class WeatherProvider extends ContentProvider {
      */
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        throw new RuntimeException("Student, you need to implement the delete method!");
+        int match = sUriMatcher.match(uri);
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
-//          TODO (2) Only implement the functionality, given the proper URI, to delete ALL rows in the weather table
+        int rows;
+        switch (match){
+            case CODE_WEATHER:
+                // COMPLETED (2) Only implement the functionality, given the proper URI, to delete ALL rows in the weather table
+                if (null == selection) selection = "1";
+                rows = db.delete(WeatherContract.WeatherEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case CODE_WEATHER_WITH_DATE:
+                String date = uri.getLastPathSegment();
+                rows = db.delete(WeatherContract.WeatherEntry.TABLE_NAME, WeatherContract.WeatherEntry.COLUMN_DATE + "=?", new String[] {date});
+                break;
+            default:
+                throw new SQLiteException("Invalid request");
+        }
 
-//      TODO (3) Return the number of rows deleted
+        if ( rows>0 ) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        // COMPLETED (3) Return the number of rows deleted
+        return rows;
     }
 
     /**

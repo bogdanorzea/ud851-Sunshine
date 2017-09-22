@@ -27,6 +27,8 @@ import android.widget.TextView;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
+import static com.example.android.sunshine.MainActivity.INDEX_WEATHER_CONDITION_ID;
+
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
  * from a {@link android.database.Cursor} to a {@link android.support.v7.widget.RecyclerView}.
@@ -48,8 +50,8 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
      * The interface that receives onClick messages.
      */
     public interface ForecastAdapterOnClickHandler {
-//      TODO (36) Refactor onClick to accept a long as its parameter rather than a String
-        void onClick(String weatherForDay);
+//      COMPLETED (36) Refactor onClick to accept a long as its parameter rather than a String
+        void onClick(long weatherId);
     }
 
     private Cursor mCursor;
@@ -112,7 +114,7 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
         /* Get human readable string using our utility method */
         String dateString = SunshineDateUtils.getFriendlyDateString(mContext, dateInMillis, false);
         /* Use the weatherId to obtain the proper description */
-        int weatherId = mCursor.getInt(MainActivity.INDEX_WEATHER_CONDITION_ID);
+        int weatherId = mCursor.getInt(INDEX_WEATHER_CONDITION_ID);
         String description = SunshineWeatherUtils.getStringForWeatherCondition(mContext, weatherId);
         /* Read high temperature from the cursor (in degrees celsius) */
         double highInCelsius = mCursor.getDouble(MainActivity.INDEX_WEATHER_MAX_TEMP);
@@ -177,9 +179,10 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
          */
         @Override
         public void onClick(View v) {
-//          TODO (37) Instead of passing the String for the clicked item, pass the date from the cursor
-            String weatherForDay = weatherSummary.getText().toString();
-            mClickHandler.onClick(weatherForDay);
+//          COMPLETED (37) Instead of passing the String for the clicked item, pass the date from the cursor
+            int position = getAdapterPosition();
+            mCursor.moveToPosition(position);
+            mClickHandler.onClick(mCursor.getLong(INDEX_WEATHER_CONDITION_ID));
         }
     }
 }

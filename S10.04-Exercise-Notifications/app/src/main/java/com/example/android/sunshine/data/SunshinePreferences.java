@@ -212,4 +212,11 @@ public final class SunshinePreferences {
         editor.putLong(lastNotificationKey, timeOfNotification);
         editor.apply();
     }
+
+    public static boolean isNotificationEnabled(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getBoolean(
+                context.getString(R.string.pref_enable_notifications_key),
+                context.getResources().getBoolean(R.bool.show_notification));
+    }
 }

@@ -18,14 +18,19 @@ package com.example.android.sunshine.sync;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.text.format.DateUtils;
 
+import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.NetworkUtils;
+import com.example.android.sunshine.utilities.NotificationUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
 
 public class SunshineSyncTask {
+
+    private static long ellapsedTimeSinceLastNotification;
 
     /**
      * Performs the network request for updated weather, parses the JSON from that request, and
@@ -73,12 +78,22 @@ public class SunshineSyncTask {
                         WeatherContract.WeatherEntry.CONTENT_URI,
                         weatherValues);
 
-//              TODO (13) Check if notifications are enabled
+                // COMPLETED (13) Check if notifications are enabled
+                boolean notificationEnabled = SunshinePreferences.isNotificationEnabled(context);
 
-//              TODO (14) Check if a day has passed since the last notification
+                // COMPLETED (14) Check if a day has passed since the last notification
+                boolean notificationSentBeforeToday = false;
+                ellapsedTimeSinceLastNotification =
+                        SunshinePreferences.getEllapsedTimeSinceLastNotification(context);
 
-//              TODO (15) If more than a day have passed and notifications are enabled, notify the user
+                if (ellapsedTimeSinceLastNotification >= DateUtils.DAY_IN_MILLIS){
+                    notificationSentBeforeToday = true;
+                }
 
+//              COMPLETED (15) If more than a day have passed and notifications are enabled, notify the user
+                if (notificationEnabled && notificationSentBeforeToday){
+                    NotificationUtils.notifyUserOfNewWeather(context);
+                }
             /* If the code reaches this point, we have successfully performed our sync */
 
             }
